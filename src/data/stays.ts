@@ -1,0 +1,51 @@
+
+export const stays = [
+  {
+    id: 1,
+    name: "The Royal Retreat",
+    category: "luxury",
+    priceRange: "₹12,000 - ₹20,000",
+    rating: 4.8,
+    imageUrl: "/placeholder.svg",
+  },
+  {
+    id: 2,
+    name: "Vagad Heritage Home",
+    category: "heritage",
+    priceRange: "₹8,000 - ₹15,000",
+    rating: 4.6,
+    imageUrl: "/placeholder.svg",
+  },
+  {
+    id: 3,
+    name: "Banswara Budget Inn",
+    category: "budget",
+    priceRange: "₹2,500 - ₹4,500",
+    rating: 4.1,
+    imageUrl: "/placeholder.svg",
+  },
+  {
+    id: 4,
+    name: "Mahi Riverside Homestay",
+    category: "homestay",
+    priceRange: "₹4,000 - ₹7,000",
+    rating: 4.9,
+    imageUrl: "/placeholder.svg",
+  },
+  {
+    id: 5,
+    name: "Dungarpur Palace Hotel",
+    category: "luxury",
+    priceRange: "₹15,000 - ₹25,000",
+    rating: 4.9,
+    imageUrl: "/placeholder.svg",
+  },
+  {
+    id: 6,
+    name: "Tribal Art Homestay",
+    category: "homestay",
+    priceRange: "₹3,500 - ₹6,000",
+    rating: 4.7,
+    imageUrl: "/placeholder.svg",
+  },
+];

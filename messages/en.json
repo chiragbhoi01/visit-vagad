@@ -1,0 +1,73 @@
+// file: messages/en.json
+{
+  "nav": {
+    "home": "Home",
+    "destinations": "Destinations",
+    "events": "Events",
+    "hotels": "Hotels",
+    "plan": "Plan Your Trip"
+  },
+  "Navbar": {
+    "planTrip": "Plan Your Trip"
+  },
+  "metadata": {
+    "title": "Fairs of Vagad | Tourism in Southern Rajasthan",
+    "description": "Explore the vibrant tribal fairs and rich culture of the Vagad region, including Banswara and Dungarpur."
+  },
+  "Hero": {
+    "title": "Visit Vagad",
+    "subtitle": "Where Nature Meets Tribal Heritage",
+    "cta": "Explore Fairs"
+  },
+  "home": {
+    "title": "Visit Vagad",
+    "subtitle": "Where Nature Meets Tribal Heritage",
+    "culturePreview": {
+      "title": "A Taste of Local Tradition",
+      "subtitle": "From the earthy flavors of its cuisine to the timeless skill of its artisans, discover the soul of Vagad's culture."
+    }
+  },
+  "Footer": {
+    "tagline": "Tourism in Southern Rajasthan",
+    "explore": "Explore",
+    "followUs": "Follow Us",
+    "language": "Language",
+    "rights": "All rights reserved.",
+    "links": {
+      "explore": "Destinations",
+      "experiences": "Experiences",
+      "stays": "Stays",
+      "about": "About Us"
+    }
+  },
+  "WhyVagad": {
+    "title": "Why Vagad?",
+    "subtitle": "Discover the hidden gem of Rajasthan",
+    "feature1_title": "Culture",
+    "feature1_desc": "Rich tribal heritage",
+    "feature2_title": "Nature",
+    "feature2_desc": "Beautiful landscapes",
+    "feature3_title": "Spirituality",
+    "feature3_desc": "Ancient temples"
+  },
+  "DestinationsPage": {
+    "title": "Explore Our Destinations",
+    "subtitle": "Journey through the heart of Vagad"
+  },
+  "destinations": {
+    "mangarhDham": {
+      "name": "Mangarh Dham",
+      "shortDescription": "A historical site of tribal sacrifice.",
+      "fullDescription": "Known as the Jallianwala Bagh of Rajasthan...",
+      "highlights": ["Tribal Martyrs Memorial", "Museum", "Annual Fair"],
+      "bestTime": "Nov-Dec"
+    },
+    "beneshwarDham": {
+      "name": "Beneshwar Dham",
+      "shortDescription": "The confluence of three sacred rivers.",
+      "fullDescription": "A holy pilgrimage site at the confluence of Som, Mahi, and Jakham rivers...",
+      "highlights": ["Shiva Temple", "Triveni Sangam", "Banswara Fair"],
+      "bestTime": "Jan-Feb"
+    }
+  }
+}
