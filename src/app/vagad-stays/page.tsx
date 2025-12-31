@@ -3,6 +3,7 @@ import { Homestay } from '@/types';
 import { Metadata } from 'next';
 import VagadStayCard from '@/components/VagadStayCard';
 import VagadStayCardSkeleton from '@/components/VagadStayCardSkeleton';
+import SubsidyCalculator from '@/components/SubsidyCalculator';
 
 // --- SEO Metadata ---
 export const metadata: Metadata = {
@@ -65,6 +66,8 @@ export default async function VagadStaysPage() {
                     </p>
                 </div>
 
+                <SubsidyCalculator />
+
                 {stays.length === 0 ? (
                     <p className="text-center text-gray-500">No homestays found. Please check back later.</p>
                 ) : (
@@ -79,7 +82,16 @@ export default async function VagadStaysPage() {
     } catch (error) {
         return (
             <div className="container mx-auto px-4 py-8 text-center">
-                <h1 className="text-2xl font-bold text-red-600">Failed to Load Homestays</h1>
+                 <div className="text-center mb-12">
+                    <h1 className="text-4xl font-bold text-deepTeal-900">Vagad Stays</h1>
+                    <p className="text-lg text-terracotta-700 mt-2">
+                        Your home in the heart of the Tribal Circuit.
+                    </p>
+                </div>
+                
+                <SubsidyCalculator />
+                
+                <h2 className="text-2xl font-bold text-red-600 mt-12">Failed to Load Homestays</h2>
                 <p className="text-gray-600 mt-2">There was an error fetching the homestays. Please try again later.</p>
             </div>
         );
@@ -94,6 +106,10 @@ export function Loading() {
                 <div className="h-10 bg-gray-300 rounded w-1/3 mx-auto mb-2"></div>
                 <div className="h-6 bg-gray-300 rounded w-1/2 mx-auto"></div>
             </div>
+            
+            {/* You can add a skeleton for the calculator here if you want */}
+            <div className="w-full max-w-lg mx-auto my-12 h-64 bg-gray-200 rounded-lg animate-pulse"></div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[...Array(6)].map((_, i) => (
                     <VagadStayCardSkeleton key={i} />

@@ -51,6 +51,14 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        deepTeal: {
+          DEFAULT: "#004D40",
+          '900': "#004D40",
+        },
+        terracotta: {
+          DEFAULT: "#E2725B",
+          '700': "#E2725B",
+        }
       },
       borderRadius: {
         lg: "var(--radius)",
