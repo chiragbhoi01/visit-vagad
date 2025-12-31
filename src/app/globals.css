@@ -1,3 +1,25 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  /* VisitVagad Theme Colors */
+  --color-background: #FDFCF0; /* Light Cream */
+  --color-foreground: #004D40; /* Deep Teal */
+  --color-primary: #004D40;
+  --color-secondary: #E2725B; /* Terracotta */
+  
+  /* Shadcn UI compatibility */
+  --color-card: white;
+  --color-border: #e2e8f0;
+  --color-ring: #004D40;
+}
+
+@layer base {
+  *, ::after, ::before {
+    @apply border-border;
+  }
+  body {
+    /* अब 'bg-background' काम करेगा क्योंकि हमने ऊपर उसे डिफाइन कर दिया है */
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}

@@ -1,6 +1,6 @@
+import './globals.css';
 import type { Metadata } from 'next';
 import { Outfit } from 'next/font/google';
-import './globals.css';
 
 export const metadata: Metadata = {
   title: 'VisitVagad - The Tribal Circuit of Rajasthan',

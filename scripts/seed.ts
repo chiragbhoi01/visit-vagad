@@ -37,8 +37,8 @@ const seedCollection = async (collectionId: string, data: any[], idKey: string) 
 
 // --- Data Generation ---
 const getDestinations = () => [
-    { name: "Mahi Bajaj Sagar Dam", description: "A breathtaking canvas of scattered islands...", location: "Banswara, Rajasthan", seo_keywords: ["Mahi Dam", "Banswara"], latitude: 23.63, longitude: 74.55 },
-    { name: "Mangarh Dham", description: "A National Monument revered as a solemn memorial...", location: "Anandpuri, Banswara", seo_keywords: ["Mangarh Dham", "Tribal History"], latitude: 23.39, longitude: 74.07 },
+    { name: "Mahi Bajaj Sagar Dam", description: "A breathtaking canvas of scattered islands...", location: "Banswara, Rajasthan", latitude: 23.63, longitude: 74.55, createdAt: new Date().toISOString() },
+    { name: "Mangarh Dham", description: "A National Monument revered as a solemn memorial...", location: "Anandpuri, Banswara", latitude: 23.39, longitude: 74.07, createdAt: new Date().toISOString() },
 ];
 
 const getArtisans = () => [
@@ -47,8 +47,8 @@ const getArtisans = () => [
 ];
 
 const getStays = () => [
-    { property_name: "Vagad Farm Retreat", price: 3200, rips_certified: true, landmark: "10km from Gagron Fort", investment_value: 1500000 },
-    { property_name: "Mahi Riverside Homestay", price: 2500, rips_certified: true, landmark: "5km from Mahi Dam", investment_value: 1200000 },
+    { property_name: "Vagad Farm Retreat", createdAt: new Date().toISOString() },
+    { property_name: "Mahi Riverside Homestay", createdAt: new Date().toISOString() },
 ];
 
 // --- Main Execution ---
@@ -59,7 +59,7 @@ const run = async () => {
     }
 
     console.log("Starting database seeding process...");
-    
+
     await seedCollection('destinations', getDestinations(), 'name');
     await seedCollection('artisans', getArtisans(), 'name');
     await seedCollection('stays', getStays(), 'property_name');
