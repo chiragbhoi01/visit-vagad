@@ -1,131 +1,140 @@
 import React from 'react';
-import HeroSection from '@/components/HeroSection';
-import FeaturedModule from '@/components/FeaturedModule';
-import Footer from '@/components/Footer';
-import BhilBazaarProductCard from '@/components/BhilBazaarProductCard';
-import VagadStayCard from '@/components/VagadStayCard';
-import { databases } from '@/lib/appwrite';
-import { ArtisanProduct, Homestay } from '@/types';
-import { Metadata } from 'next';
+import { HeroSection } from '@/components/home/HeroSection';
+import FeaturedModule from '@/components/home/FeaturedModule';
+import BhilBazaarProductCard from '@/components/cards/BhilBazaarProductCard';
+import VagadStayCard from '@/components/cards/VagadStayCard';
+import DestinationCard from '@/components/cards/DestinationCard'; // Assuming a new card for destinations
+import EventCard from '@/components/cards/EventCard'; // Assuming a new card for events
+import FoodCard from '@/components/cards/FoodCard'; // Assuming a new card for food
+
+import { getArtisanProducts, getHotels, getDestinations, getEvents, getFoodItems } from '@/lib/queries';
+import { Destination, Hotel, ArtisanProduct, Event, Food } from '@/lib/types';
 import Image from 'next/image';
-
-// --- SEO Metadata ---
-export const metadata: Metadata = {
-  title: 'VisitVagad - Discover the Tribal Circuit of Rajasthan',
-  description: 'Explore the untouched beauty of Banswara and Dungarpur. Your official guide to the Vagad region, featuring authentic tribal crafts, rural homestays, and serene natural landscapes.',
-};
-
-// --- Data Fetching ---
-async function getFeaturedProducts(): Promise<ArtisanProduct[]> {
-    try {
-        // Fetch top 3 products, perhaps sorted by creation date or a 'featured' flag
-        const response = await databases.listDocuments('69540a3a001eb8d06e9f', 'artisans', [
-            // Assuming Appwrite's API supports limit
-            // Query.limit(3) 
-        ]);
-        return response.documents.slice(0, 3).map(doc => ({
-            $id: doc.$id,
-            name: (doc.name as string) || 'Unnamed Product',
-            description: (doc.description as string) || 'No description provided.',
-            price: (doc.price as number) || 0,
-            imageUrl: (doc.imageUrl as string) || '/images/placeholder.jpg',
-            artisan: {
-              name: (doc.artisan?.name as string) || 'Unknown Artisan',
-              isGovtVerified: (doc.artisan?.isGovtVerified as boolean) || false,
-            },
-            category: (doc.category as 'Bamboo' | 'Stone' | 'Pottery') || 'Bamboo',
-            $createdAt: (doc.$createdAt as string) || '',
-            $updatedAt: (doc.$updatedAt as string) || '',
-            $permissions: (doc.$permissions as string[]) || [],
-            $collectionId: (doc.$collectionId as string) || '',
-            $databaseId: (doc.$databaseId as string) || '',
-            $sequence: (doc.$sequence as number) || 0,
-        })) as ArtisanProduct[];
-    } catch (error) {
-        console.error("Failed to fetch featured products:", error);
-        return [];
-    }
-}
-
-async function getFeaturedStays(): Promise<Homestay[]> {
-    try {
-        // Fetch top 3 RIPS-certified stays
-        const response = await databases.listDocuments('69540a3a001eb8d06e9f', 'stays', [
-            // Query.equal('rips_certified', true),
-            // Query.limit(3)
-        ]);
-        return response.documents.filter(d => (d as any).rips_certified).slice(0, 3).map(doc => ({
-            $id: doc.$id,
-            name: (doc.name as string) || 'Unnamed Homestay',
-            description: (doc.description as string) || 'No description provided.',
-            pricePerNight: (doc.price as number) || 0, // Using 'price' from Appwrite, mapping to 'pricePerNight'
-            imageUrl: (doc.imageUrl as string) || '/images/placeholder.jpg',
-            proximityToLandmark: (doc.landmark as string) || 'Unknown', // Mapping 'landmark' from Appwrite
-            isRips2024Certified: (doc.rips_certified as boolean) || false, // Mapping 'rips_certified' from Appwrite
-            location: (doc.location as { latitude: number; longitude: number }) || { latitude: 0, longitude: 0 },
-            $createdAt: (doc.$createdAt as string) || '',
-            $updatedAt: (doc.$updatedAt as string) || '',
-            $permissions: (doc.$permissions as string[]) || [],
-            $collectionId: (doc.$collectionId as string) || '',
-            $databaseId: (doc.$databaseId as string) || '',
-            $sequence: (doc.$sequence as number) || 0,
-        })) as Homestay[];
-    } catch (error) {
-        console.error("Failed to fetch featured stays:", error);
-        return [];
-    }
-}
+import { getAppwriteImageSrc } from '@/lib/storage';
+import { Query } from 'node-appwrite'; // For using Appwrite Query.equal etc.
 
 // --- Home Page Component ---
 export default async function HomePage() {
-  const featuredProducts = await getFeaturedProducts();
-  const featuredStays = await getFeaturedStays();
+  const featuredArtisanProducts = await getArtisanProducts([Query.equal('isFeatured', true), Query.limit(3)]);
+  const featuredHotels = await getHotels([Query.equal('isFeatured', true), Query.limit(3)]);
+  const featuredDestinations = await getDestinations([Query.equal('isFeatured', true), Query.limit(3)]);
+  const featuredEvents = await getEvents([Query.equal('isFeatured', true), Query.limit(3)]);
+  const featuredFoodItems = await getFoodItems([Query.equal('isFeatured', true), Query.limit(3)]);
+
+  // Placeholder for HeroSection dynamic data - will need a dedicated featured content collection
+  const heroData = {
+    title: "Discover the Untouched Beauty of Vagad",
+    description: "Immerse yourself in the serene waters of Mahi and explore ancient tribal heritage.",
+    backgroundImageId: "YOUR_APPWRITE_HERO_IMAGE_FILE_ID", // Placeholder
+    backgroundImageBucketId: process.env.APPWRITE_BUCKET_ID_GLOBAL_IMAGES!, // Placeholder
+  };
 
   return (
     <>
-      <HeroSection />
+      <HeroSection 
+        title={heroData.title}
+        description={heroData.description}
+        backgroundImageId={heroData.backgroundImageId}
+        backgroundImageBucketId={heroData.backgroundImageBucketId}
+      />
 
-      <main>
+      <main className="container mx-auto px-4 py-8">
+        {/* Featured Destinations */}
+        {featuredDestinations.length > 0 && (
+          <FeaturedModule
+            title="Explore Vagad's Wonders"
+            subtitle="Discover breathtaking places and unique cultural experiences."
+            linkText="View All Destinations"
+            linkHref="/destinations"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredDestinations.map(destination => (
+                <DestinationCard key={destination.$id} destination={destination} />
+              ))}
+            </div>
+          </FeaturedModule>
+        )}
+
+        {/* Featured Events */}
+        {featuredEvents.length > 0 && (
+          <FeaturedModule
+            title="Upcoming Events & Festivals"
+            subtitle="Immerse yourself in the vibrant culture of Vagad."
+            bgColor="bg-gray-100"
+            linkText="View All Events"
+            linkHref="/events"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredEvents.map(event => (
+                <EventCard key={event.$id} event={event} />
+              ))}
+            </div>
+          </FeaturedModule>
+        )}
+
+        {/* Featured Food */}
+        {featuredFoodItems.length > 0 && (
+          <FeaturedModule
+            title="Taste the Flavors of Vagad"
+            subtitle="Indulge in authentic local cuisines and culinary delights."
+            linkText="View All Food"
+            linkHref="/food"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredFoodItems.map(foodItem => (
+                <FoodCard key={foodItem.$id} foodItem={foodItem} />
+              ))}
+            </div>
+          </FeaturedModule>
+        )}
+
         {/* Bhil Bazaar Preview */}
-        <FeaturedModule 
-          title="From the Heart of the Tribe"
-          subtitle="Discover authentic crafts from government-verified artisans in our Bhil Bazaar."
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {featuredProducts.length > 0 ? (
-                featuredProducts.map(product => <BhilBazaarProductCard key={product.$id} product={product} />)
-            ) : (
-                <p className="col-span-3 text-center">Featured products coming soon.</p>
-            )}
-          </div>
-        </FeaturedModule>
+        {featuredArtisanProducts.length > 0 && (
+          <FeaturedModule 
+            title="From the Heart of the Tribe"
+            subtitle="Discover authentic crafts from government-verified artisans in our Bhil Bazaar."
+            bgColor="bg-gray-100"
+            linkText="Visit Bhil Bazaar"
+            linkHref="/bhil-bazaar" // Assuming a /bhil-bazaar route
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredArtisanProducts.map(product => <BhilBazaarProductCard key={product.$id} product={product} />)}
+            </div>
+          </FeaturedModule>
+        )}
 
         {/* Vagad Stays Preview */}
-        <FeaturedModule 
-          title="Stay with the Locals"
-          subtitle="Experience true hospitality in RIPS 2024 certified homestays and support the local economy."
-          bgColor="bg-white"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {featuredStays.length > 0 ? (
-                featuredStays.map(stay => <VagadStayCard key={stay.$id} stay={stay} />)
-            ) : (
-                <p className="col-span-3 text-center">Featured homestays coming soon.</p>
-            )}
-          </div>
-           <p className="text-center mt-8 text-sm text-gray-500">
-                Local investors benefit from a <strong>23% Capital Subsidy</strong> under the RIPS 2024 scheme.
-            </p>
-        </FeaturedModule>
+        {featuredHotels.length > 0 && (
+          <FeaturedModule 
+            title="Stay with the Locals"
+            subtitle="Experience true hospitality in RIPS 2024 certified homestays and support the local economy."
+            linkText="Find Your Stay"
+            linkHref="/stays" // Assuming a /stays route
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredHotels.map(hotel => <VagadStayCard key={hotel.$id} stay={hotel} />)}
+            </div>
+          </FeaturedModule>
+        )}
 
         {/* National Monument Focus */}
         <FeaturedModule
             title="A Tribute to Valor"
             subtitle="Mangarh Dham, a National Monument, stands as a testament to the heroic spirit of the tribal community."
+            bgColor="bg-gray-100"
         >
             <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 <div className="relative h-64 rounded-lg overflow-hidden">
-                    <Image src="/images/mangarh-dham.jpg" alt="Mangarh Dham" layout="fill" objectFit="cover" />
+                    <Image 
+                      src={getAppwriteImageSrc(
+                        process.env.APPWRITE_BUCKET_ID_GLOBAL_IMAGES!, // Assuming global images bucket for this static content image
+                        "YOUR_MANGARH_DHAM_IMAGE_FILE_ID", // Placeholder for specific image file ID
+                        800, 600
+                      )} 
+                      alt="Mangarh Dham" 
+                      layout="fill" 
+                      objectFit="cover" 
+                    />
                 </div>
                 <div className="text-left">
                     <h3 className="text-2xl font-bold text-[#004D40] mb-4">Mangarh Dham: A Sacred Hilltop</h3>
@@ -137,8 +146,6 @@ export default async function HomePage() {
             </div>
         </FeaturedModule>
       </main>
-
-      <Footer />
     </>
   );
 }

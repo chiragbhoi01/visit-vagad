@@ -1,24 +1,37 @@
 import { Search, MapPin, Calendar, Compass } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { getAppwriteImageSrc } from "@/lib/storage";
 
-export function HeroSection() {
+interface HeroSectionProps {
+    title: string;
+    description: string;
+    backgroundImageId?: string;
+    backgroundImageBucketId?: string;
+}
+
+export function HeroSection({ title, description, backgroundImageId, backgroundImageBucketId }: HeroSectionProps) {
+    const backgroundImageUrl = backgroundImageId && backgroundImageBucketId
+        ? getAppwriteImageSrc(backgroundImageBucketId, backgroundImageId, 1920, 1080, 80) // Optimized for large display
+        : undefined; // Fallback or transparent
+
     return (
         <div className="relative w-full h-[85vh] flex items-center justify-center overflow-hidden bg-deepTeal-900">
-            {/* Background Image Placeholder - In real app use Next.js Image */}
-            <div
-                className="absolute inset-0 z-0 bg-cover bg-center opacity-60 mix-blend-overlay"
-                style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1477587458883-47145ed94245?q=80&w=2670&auto=format&fit=crop")' }}
-            />
+            {/* Dynamic Background Image */}
+            {backgroundImageUrl && (
+                <div
+                    className="absolute inset-0 z-0 bg-cover bg-center opacity-60 mix-blend-overlay"
+                    style={{ backgroundImage: `url("${backgroundImageUrl}")` }}
+                />
+            )}
             <div className="absolute inset-0 z-0 bg-gradient-to-t from-deepTeal-950 via-deepTeal-900/40 to-transparent" />
 
             <div className="relative z-10 container px-4 md:px-6 flex flex-col items-center text-center space-y-8">
                 <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-white drop-shadow-lg max-w-4xl mx-auto">
-                    Discover the Soul of the <span className="text-terracotta">Tribal Circuit</span>
+                    {title}
                 </h1>
                 <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto font-light">
-                    Explore Banswara, the 'City of Hundred Islands', and Dungarpur, the 'City of Hills'.
-                    Experience the untold stories of Vagad.
+                    {description}
                 </p>
 
                 {/* Smart Search Bar */}
@@ -27,7 +40,7 @@ export function HeroSection() {
                         <MapPin className="text-terracotta w-5 h-5 mr-3 shrink-0" />
                         <Input
                             type="text"
-                            placeholder="Where to? (e.g. Banswara)"
+                            placeholder="Where to?"
                             className="border-none bg-transparent text-white placeholder:text-gray-300 focus-visible:ring-0 h-10 text-base"
                         />
                     </div>
@@ -35,7 +48,7 @@ export function HeroSection() {
                         <Compass className="text-terracotta w-5 h-5 mr-3 shrink-0" />
                         <Input
                             type="text"
-                            placeholder="Experience (e.g. Tribal Art)"
+                            placeholder="Experience"
                             className="border-none bg-transparent text-white placeholder:text-gray-300 focus-visible:ring-0 h-10 text-base"
                         />
                     </div>

@@ -2,12 +2,13 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Homestay } from '@/types';
+import { Hotel } from '@/lib/types'; // Corrected import
 import { calculateIncentives, RipsIncentives } from '@/lib/rips';
 import { Star, MapPin } from 'lucide-react';
+import { getAppwriteImageSrc } from '@/lib/storage'; // New import
 
 interface VagadStayCardProps {
-  stay: Homestay & { paryatanMitraRating?: number; uniqueExperienceStory?: string; investmentAmount?: number };
+  stay: Hotel & { paryatanMitraRating?: number; uniqueExperienceStory?: string; investmentAmount?: number };
 }
 
 const VagadStayCard: React.FC<VagadStayCardProps> = ({ stay }) => {
@@ -19,11 +20,15 @@ const VagadStayCard: React.FC<VagadStayCardProps> = ({ stay }) => {
     }
   };
 
+  const imageUrl = stay.coverImageId && stay.imageBucketId
+    ? getAppwriteImageSrc(stay.imageBucketId, stay.coverImageId, 400, 300) // Optimized for card display
+    : '/vercel.svg'; // Fallback for missing image ID, replace with a proper placeholder if needed
+
   return (
     <div className="group relative max-w-sm rounded-lg overflow-hidden border border-gray-200 bg-white shadow-sm transition-all hover:shadow-xl duration-300 ease-in-out">
       <div className="relative w-full h-56 overflow-hidden">
         <Image
-          src={stay.imageUrl}
+          src={imageUrl}
           alt={stay.name}
           layout="fill"
           objectFit="cover"

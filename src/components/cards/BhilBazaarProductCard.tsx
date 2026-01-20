@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
-import { ArtisanProduct } from '@/types';
+import { ArtisanProduct } from '@/lib/types'; // Corrected import
 import { ShieldCheck, Sprout, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
+import { getAppwriteImageSrc } from '@/lib/storage'; // New import
 
 interface BhilBazaarCardProps {
   product: ArtisanProduct;
@@ -19,8 +20,9 @@ const handleReserveProduct = async (productId: string) => {
 };
 
 const BhilBazaarCard: React.FC<BhilBazaarCardProps> = ({ product }) => {
-  // Use product.imageUrl directly since storage is not available
-  const imageUrl = product.imageUrl;
+  const imageUrl = product.imageId
+    ? getAppwriteImageSrc(product.imageBucketId, product.imageId, 400, 300) // Optimized for card display
+    : '/vercel.svg'; // Fallback for missing image ID, replace with a proper placeholder if needed
 
   return (
     <div className="group relative max-w-sm rounded-lg overflow-hidden border border-gray-200 bg-white shadow-sm transition-all hover:shadow-xl duration-300 ease-in-out">
