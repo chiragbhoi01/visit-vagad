@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { MapPin } from 'lucide-react';
 import { Destination } from '@/lib/types';
-import { getAppwriteImageSrc } from '@/lib/storage';
+import { getAppwriteFilePreviewUrl } from '@/lib/storage';
 
 interface DestinationCardProps {
   destination: Destination;
@@ -12,7 +12,7 @@ interface DestinationCardProps {
 
 const DestinationCard: React.FC<DestinationCardProps> = ({ destination }) => {
   const imageUrl = destination.coverImageId
-    ? getAppwriteImageSrc(process.env.APPWRITE_BUCKET_ID_DESTINATIONS!, destination.coverImageId, 400, 300)
+    ? getAppwriteFilePreviewUrl(destination.coverImageId, 400, 300).href
     : '/vercel.svg'; // Fallback
 
   return (

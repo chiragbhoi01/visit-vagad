@@ -1,64 +1,36 @@
 // src/lib/storage.ts
-// Utility functions for handling Appwrite Storage images.
 
-import { serverStorage } from './appwrite';
+import { clientEnv, serverEnv } from './env'; // Import both for endpoint and bucket ID
 
 /**
- * Generates an Appwrite Storage image URL.
- * @param bucketId The ID of the storage bucket.
- * @param fileId The ID of the file.
- * @param width Optional. Desired width of the image.
- * @param height Optional. Desired height of the image.
- * @param quality Optional. Image quality (0-100).
- * @returns The URL string for the Appwrite Storage image.
+ * Generates a public URL to view a file from Appwrite Storage.
+ * @param fileId The ID of the file in Appwrite Storage.
+ * @returns The full URL to view the file.
  */
-export function getAppwriteImageSrc(
-  bucketId: string,
-  fileId: string,
-  width?: number,
-  height?: number,
-  quality?: number
-): string {
-  // Appwrite's getFilePreview method parameters
-  const params = {
-    width,
-    height,
-    quality,
-    // Add more parameters like gravity, crop, etc., if needed
-  };
-
-  // Filter out undefined parameters
-  const validParams = Object.entries(params).reduce((acc, [key, value]) => {
-    if (value !== undefined) {
-      acc[key] = value;
-    }
-    return acc;
-  }, {} as Record<string, any>);
-
-  // Appwrite SDK's getFilePreview returns a URL
-  // This is a simplified approach, typically you'd generate the URL manually
-  // or use the SDK's getFileView/getFileDownload directly if not using file preview features.
-  // For previews, we construct the URL.
-  // Example: http://[HOSTNAME]/v1/storage/buckets/[BUCKET_ID]/files/[FILE_ID]/preview?width=100&height=100&quality=100
-  // Note: For server-side rendering, using serverStorage.getFilePreview() might be better,
-  // but it returns a Blob, which is not directly usable as an img src in HTML.
-  // So, constructing the URL directly for <img> src is common.
-
-  const baseUrl = `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/storage/buckets/${bucketId}/files/${fileId}/preview`;
-  const queryString = Object.entries(validParams)
-    .map(([key, value]) => `${key}=${value}`)
-    .join('&');
-
-  return queryString ? `${baseUrl}?${queryString}` : baseUrl;
+export function getAppwriteFileViewUrl(fileId: string): URL {
+  return new URL(
+    `${clientEnv.NEXT_PUBLIC_APPWRITE_ENDPOINT}/storage/buckets/${serverEnv.APPWRITE_BUCKET_ID_MEDIA}/files/${fileId}/view`
+  );
 }
 
 /**
- * Gets a file view URL from Appwrite Storage.
- * Useful for direct file access without transformation.
- * @param bucketId The ID of the storage bucket.
- * @param fileId The ID of the file.
- * @returns The URL string for the Appwrite Storage file view.
+ * Generates a public URL for a transformed image preview.
+ * @param fileId The ID of the file in Appwrite Storage.
+ * @param width Optional width for the transformation.
+ * @param height Optional height for the transformation.
+ * @returns The full URL for the image preview.
  */
-export function getAppwriteFileViewSrc(bucketId: string, fileId: string): string {
-  return `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/storage/buckets/${bucketId}/files/${fileId}/view`;
+export function getAppwriteFilePreviewUrl(
+  fileId: string, 
+  width?: number, 
+  height?: number
+): URL {
+  const params = new URLSearchParams();
+  if (width) params.append('width', width.toString());
+  if (height) params.append('height', height.toString());
+
+  const queryString = params.toString();
+  const baseUrl = `${clientEnv.NEXT_PUBLIC_APPWRITE_ENDPOINT}/storage/buckets/${serverEnv.APPWRITE_BUCKET_ID_MEDIA}/files/${fileId}/preview`;
+
+  return new URL(queryString ? `${baseUrl}?${queryString}` : baseUrl);
 }

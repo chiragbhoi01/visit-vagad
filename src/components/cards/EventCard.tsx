@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Calendar, MapPin } from 'lucide-react';
 import { Event } from '@/lib/types';
-import { getAppwriteImageSrc } from '@/lib/storage';
+import { getAppwriteFilePreviewUrl } from '@/lib/storage';
 
 interface EventCardProps {
   event: Event;
@@ -12,7 +12,7 @@ interface EventCardProps {
 
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
   const imageUrl = event.coverImageId
-    ? getAppwriteImageSrc(process.env.APPWRITE_BUCKET_ID_EVENTS!, event.coverImageId, 400, 300)
+    ? getAppwriteFilePreviewUrl(event.coverImageId, 400, 300).href
     : '/vercel.svg'; // Fallback
 
   const eventDate = new Date(event.date).toLocaleDateString('en-IN', {

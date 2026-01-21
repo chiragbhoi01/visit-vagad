@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Hotel } from '@/lib/types'; // Corrected import
 import { calculateIncentives, RipsIncentives } from '@/lib/rips';
 import { Star, MapPin } from 'lucide-react';
-import { getAppwriteImageSrc } from '@/lib/storage'; // New import
+import { getAppwriteFilePreviewUrl } from '@/lib/storage'; // New import
 
 interface VagadStayCardProps {
   stay: Hotel & { paryatanMitraRating?: number; uniqueExperienceStory?: string; investmentAmount?: number };
@@ -20,8 +20,8 @@ const VagadStayCard: React.FC<VagadStayCardProps> = ({ stay }) => {
     }
   };
 
-  const imageUrl = stay.coverImageId && stay.imageBucketId
-    ? getAppwriteImageSrc(stay.imageBucketId, stay.coverImageId, 400, 300) // Optimized for card display
+  const imageUrl = stay.coverImageId
+    ? getAppwriteFilePreviewUrl(stay.coverImageId, 400, 300).href // Optimized for card display
     : '/vercel.svg'; // Fallback for missing image ID, replace with a proper placeholder if needed
 
   return (

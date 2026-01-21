@@ -1,18 +1,17 @@
 import { Search, MapPin, Calendar, Compass } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { getAppwriteImageSrc } from "@/lib/storage";
+import { getAppwriteFilePreviewUrl } from "@/lib/storage";
 
 interface HeroSectionProps {
     title: string;
     description: string;
     backgroundImageId?: string;
-    backgroundImageBucketId?: string;
 }
 
-export function HeroSection({ title, description, backgroundImageId, backgroundImageBucketId }: HeroSectionProps) {
-    const backgroundImageUrl = backgroundImageId && backgroundImageBucketId
-        ? getAppwriteImageSrc(backgroundImageBucketId, backgroundImageId, 1920, 1080, 80) // Optimized for large display
+export function HeroSection({ title, description, backgroundImageId }: HeroSectionProps) {
+    const backgroundImageUrl = backgroundImageId
+        ? getAppwriteFilePreviewUrl(backgroundImageId, 1920, 1080).href // Optimized for large display
         : undefined; // Fallback or transparent
 
     return (

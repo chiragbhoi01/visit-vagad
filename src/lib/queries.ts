@@ -3,7 +3,7 @@
 // These functions are designed to be used in Server Components, Server Actions, or API Routes.
 
 import { Query } from 'node-appwrite';
-
+import { serverEnv } from '@/lib/env';
 import { serverDatabases } from './appwrite';
 
 import { Destination, Event, Food, Hotel, GlobalSettings, ArtisanProduct } from './types'; // Added ArtisanProduct
@@ -14,19 +14,19 @@ import { Destination, Event, Food, Hotel, GlobalSettings, ArtisanProduct } from 
 
 // These should ideally come from environment variables.
 
-const DATABASE_ID = process.env.APPWRITE_DATABASE_ID as string;
+const DATABASE_ID = serverEnv.APPWRITE_DATABASE_ID;
 
-const COLLECTION_DESTINATIONS_ID = process.env.APPWRITE_COLLECTION_DESTINATIONS_ID as string;
+const COLLECTION_DESTINATIONS_ID = serverEnv.APPWRITE_COLLECTION_DESTINATIONS_ID;
 
-const COLLECTION_EVENTS_ID = process.env.APPWRITE_COLLECTION_EVENTS_ID as string;
+const COLLECTION_EVENTS_ID = serverEnv.APPWRITE_COLLECTION_EVENTS_ID;
 
-const COLLECTION_FOOD_ID = process.env.APPWRITE_COLLECTION_FOOD_ID as string;
+const COLLECTION_FOOD_ID = serverEnv.APPWRITE_COLLECTION_FOOD_ID;
 
-const COLLECTION_HOTELS_ID = process.env.APPWRITE_COLLECTION_HOTELS_ID as string;
+const COLLECTION_HOTELS_ID = serverEnv.APPWRITE_COLLECTION_HOTELS_ID;
 
-const COLLECTION_SETTINGS_ID = process.env.APPWRITE_COLLECTION_SETTINGS_ID as string; // New: Settings Collection ID
+const COLLECTION_SETTINGS_ID = serverEnv.APPWRITE_COLLECTION_SETTINGS_ID; // New: Settings Collection ID
 
-const COLLECTION_ARTISANS_ID = process.env.APPWRITE_COLLECTION_ARTISANS_ID as string; // New: Artisans Collection ID
+const COLLECTION_ARTISANS_ID = serverEnv.APPWRITE_COLLECTION_ARTISANS_ID; // New: Artisans Collection ID
 
 
 
@@ -50,7 +50,7 @@ export async function getGlobalSettings(queries: Query[] = []): Promise<GlobalSe
 
       COLLECTION_SETTINGS_ID,
 
-      [...queries.map(q => q.toString()), Query.limit(1).toString()].join('&')
+      [...queries.map(q => q.toString()), Query.limit(1).toString()]
 
     );
 
@@ -90,9 +90,9 @@ export async function getDestinations(queries: Query[] = []): Promise<Destinatio
 
     const response = await serverDatabases.listDocuments(
 
-      DATABASE_ID,
+            COLLECTION_DESTINATIONS_ID,
 
-[...queries.map(q => q.toString()), Query.limit(100).toString()].join('&') // Adjust limit as needed, consider pagination for large datasets
+            [...queries.map(q => q.toString()), Query.limit(100).toString()]
 
     );
 
@@ -132,7 +132,7 @@ export async function getDestinationBySlug(slug: string): Promise<Destination | 
 
       COLLECTION_DESTINATIONS_ID,
 
-      [Query.equal('slug', slug).toString(), Query.limit(1).toString()].join('&')
+      [Query.equal('slug', slug).toString(), Query.limit(1).toString()]
 
     );
 
@@ -264,7 +264,7 @@ export async function getEvents(queries: Query[] = []): Promise<Event[]> {
 
       COLLECTION_EVENTS_ID,
 
-      [...queries.map(q => q.toString()), Query.limit(100).toString(), Query.orderDesc('date').toString()].join('&')
+      [...queries.map(q => q.toString()), Query.limit(100).toString(), Query.orderDesc('date').toString()]
 
     );
 
@@ -296,13 +296,15 @@ export async function getFoodItems(queries: Query[] = []): Promise<Food[]> {
 
   try {
 
-    const response = await serverDatabases.listDocuments(
+        const response = await serverDatabases.listDocuments(
 
-      DATABASE_ID,
+          DATABASE_ID,
 
-      [...queries.map(q => q.toString()), Query.limit(100).toString()]
+          COLLECTION_FOOD_ID,
 
-    );
+          [...queries.map(q => q.toString()), Query.limit(100).toString()]
+
+        );
 
     return response.documents as unknown as Food[];
 
@@ -332,13 +334,15 @@ export async function getHotels(queries: Query[] = []): Promise<Hotel[]> {
 
   try {
 
-    const response = await serverDatabases.listDocuments(
+        const response = await serverDatabases.listDocuments(
 
-      DATABASE_ID,
+          DATABASE_ID,
 
-      [...queries.map(q => q.toString()), Query.limit(100).toString()]
+          COLLECTION_HOTELS_ID,
 
-    );
+          [...queries.map(q => q.toString()), Query.limit(100).toString()]
+
+        );
 
     return response.documents as unknown as Hotel[];
 
@@ -368,13 +372,15 @@ export async function getArtisanProducts(queries: Query[] = []): Promise<Artisan
 
   try {
 
-    const response = await serverDatabases.listDocuments(
+        const response = await serverDatabases.listDocuments(
 
-      DATABASE_ID,
+          DATABASE_ID,
 
-      [...queries.map(q => q.toString()), Query.limit(100).toString()]
+          COLLECTION_ARTISANS_ID,
 
-    );
+          [...queries.map(q => q.toString()), Query.limit(100).toString()]
+
+        );
 
     return response.documents as unknown as ArtisanProduct[];
 

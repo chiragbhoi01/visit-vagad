@@ -15,6 +15,7 @@ export const destinationSchema = z.object({
   coverImage: z.any().optional(),
   galleryImageIds: z.array(z.string()).optional(),
   isFeatured: z.boolean().default(false),
+  isNationalMonumnet: z.boolean().default(false),
   seoTitle: z.string().optional(),
   seoDescription: z.string().optional(),
 });

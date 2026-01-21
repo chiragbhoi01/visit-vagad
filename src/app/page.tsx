@@ -1,4 +1,5 @@
 import React from 'react';
+import { serverEnv } from '@/lib/env';
 import { HeroSection } from '@/components/home/HeroSection';
 import FeaturedModule from '@/components/home/FeaturedModule';
 import BhilBazaarProductCard from '@/components/cards/BhilBazaarProductCard';
@@ -10,7 +11,7 @@ import FoodCard from '@/components/cards/FoodCard'; // Assuming a new card for f
 import { getArtisanProducts, getHotels, getDestinations, getEvents, getFoodItems } from '@/lib/queries';
 import { Destination, Hotel, ArtisanProduct, Event, Food } from '@/lib/types';
 import Image from 'next/image';
-import { getAppwriteImageSrc } from '@/lib/storage';
+import { getAppwriteFilePreviewUrl } from '@/lib/storage';
 import { Query } from 'node-appwrite'; // For using Appwrite Query.equal etc.
 
 // --- Home Page Component ---
@@ -26,7 +27,6 @@ export default async function HomePage() {
     title: "Discover the Untouched Beauty of Vagad",
     description: "Immerse yourself in the serene waters of Mahi and explore ancient tribal heritage.",
     backgroundImageId: "YOUR_APPWRITE_HERO_IMAGE_FILE_ID", // Placeholder
-    backgroundImageBucketId: process.env.APPWRITE_BUCKET_ID_GLOBAL_IMAGES!, // Placeholder
   };
 
   return (
@@ -35,7 +35,6 @@ export default async function HomePage() {
         title={heroData.title}
         description={heroData.description}
         backgroundImageId={heroData.backgroundImageId}
-        backgroundImageBucketId={heroData.backgroundImageBucketId}
       />
 
       <main className="container mx-auto px-4 py-8">
@@ -126,11 +125,10 @@ export default async function HomePage() {
             <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 <div className="relative h-64 rounded-lg overflow-hidden">
                     <Image 
-                      src={getAppwriteImageSrc(
-                        process.env.APPWRITE_BUCKET_ID_GLOBAL_IMAGES!, // Assuming global images bucket for this static content image
+                      src={getAppwriteFilePreviewUrl(
                         "YOUR_MANGARH_DHAM_IMAGE_FILE_ID", // Placeholder for specific image file ID
                         800, 600
-                      )} 
+                      ).href} 
                       alt="Mangarh Dham" 
                       layout="fill" 
                       objectFit="cover" 

@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Utensils } from 'lucide-react';
 import { Food } from '@/lib/types';
-import { getAppwriteImageSrc } from '@/lib/storage';
+import { getAppwriteFilePreviewUrl } from '@/lib/storage';
 
 interface FoodCardProps {
   foodItem: Food;
@@ -12,7 +12,7 @@ interface FoodCardProps {
 
 const FoodCard: React.FC<FoodCardProps> = ({ foodItem }) => {
   const imageUrl = foodItem.imageUrl
-    ? getAppwriteImageSrc(process.env.APPWRITE_BUCKET_ID_FOOD!, foodItem.imageUrl, 400, 300) // Assuming imageUrl here is actually a file ID
+    ? getAppwriteFilePreviewUrl(foodItem.imageUrl, 400, 300).href // Assuming imageUrl here is actually a file ID
     : '/vercel.svg'; // Fallback
 
   return (

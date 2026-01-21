@@ -1,31 +1,26 @@
-
 'use client';
 
 import React from 'react';
 import { DestinationForm } from '@/components/admin/DestinationForm';
 import { updateDestination } from '../../actions';
-import { toast } from 'sonner';
 import { Destination } from '@/lib/types';
+import { toast } from 'sonner';
 
 interface EditDestinationFormProps {
   destination: Destination;
 }
 
 const EditDestinationForm: React.FC<EditDestinationFormProps> = ({ destination }) => {
-
-  const handleSubmit = async (values: any) => {
-    try {
-      await updateDestination(destination.$id, values);
-      toast.success('Destination updated successfully!');
-    } catch (error) {
-      toast.error('Failed to update destination.');
-    }
-  };
+  // Use `bind` to pre-fill the `id` argument of the server action.
+  const updateDestinationWithId = updateDestination.bind(null, destination.$id);
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Edit Destination</h1>
-      <DestinationForm onSubmit={handleSubmit} defaultValues={destination} />
+      <h1 className="text-2xl font-bold mb-4">Edit {destination.name}</h1>
+      <DestinationForm 
+        action={updateDestinationWithId} 
+        defaultValues={destination} 
+      />
     </div>
   );
 };

@@ -4,7 +4,7 @@ import React from 'react';
 import { ArtisanProduct } from '@/lib/types'; // Corrected import
 import { ShieldCheck, Sprout, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
-import { getAppwriteImageSrc } from '@/lib/storage'; // New import
+import { getAppwriteFilePreviewUrl } from '@/lib/storage'; // New import
 
 interface BhilBazaarCardProps {
   product: ArtisanProduct;
@@ -21,7 +21,7 @@ const handleReserveProduct = async (productId: string) => {
 
 const BhilBazaarCard: React.FC<BhilBazaarCardProps> = ({ product }) => {
   const imageUrl = product.imageId
-    ? getAppwriteImageSrc(product.imageBucketId, product.imageId, 400, 300) // Optimized for card display
+    ? getAppwriteFilePreviewUrl(product.imageId, 400, 300).href // Optimized for card display
     : '/vercel.svg'; // Fallback for missing image ID, replace with a proper placeholder if needed
 
   return (

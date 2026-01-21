@@ -28,6 +28,7 @@ export interface Destination extends AppwriteDocument {
   coverImageId: string; // ID from Appwrite Storage
   galleryImageIds: string[]; // Array of IDs from Appwrite Storage
   isFeatured: boolean;
+  isNationalMonumnet: boolean;
   seoTitle?: string;
   seoDescription?: string;
 }

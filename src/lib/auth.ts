@@ -1,50 +1,47 @@
 // src/lib/auth.ts
 // Server-side authentication and authorization utilities using Appwrite.
 
-// src/lib/auth.ts
-// Server-side authentication and authorization utilities using Appwrite.
-
-import { serverAccount, serverUsers } from './appwrite';
-import { Permission, Role } from 'node-appwrite';
-import { env } from './env'; // Use the centralized env access
+import { Permission, Role, Users as ServerUsers } from 'node-appwrite';
+import { serverEnv, clientEnv } from './env'; // Use the new separated env variables
 import { NextRequest } from 'next/server';
-import { Client as ServerClient, Account as ServerAccount, Users as ServerUsers } from 'node-appwrite';
+import { serverAccount, serverUsers } from './appwrite'; // Import both serverAccount and serverUsers
 
 /**
  * Checks if the current session is authenticated and belongs to the admin team.
  * This function is intended for server-side use only.
+ * It safely verifies a user's session from a request cookie.
  * @returns {Promise<boolean>} True if authenticated as admin, false otherwise.
  */
 export async function isAdminAuthenticated(request: NextRequest): Promise<boolean> {
   try {
-    const session = request.cookies.get('a_session_' + env.NEXT_PUBLIC_APPWRITE_PROJECT_ID.toLowerCase())?.value;
-
-    if (!session) {
+    // 1. Get the session cookie. The project ID is public and used to name the cookie.
+    const sessionCookie = request.cookies.get('a_session_' + clientEnv.NEXT_PUBLIC_APPWRITE_PROJECT_ID.toLowerCase());
+    if (!sessionCookie || !sessionCookie.value) {
       return false;
     }
-    
-    const serverClient = new ServerClient()
-      .setEndpoint(env.NEXT_PUBLIC_APPWRITE_ENDPOINT)
-      .setProject(env.NEXT_PUBLIC_APPWRITE_PROJECT_ID)
-      .setKey(env.APPWRITE_API_KEY);
-      
-    const serverAccount = new ServerAccount(serverClient);
-    const account = await serverAccount.get();
 
+    // 2. Verify the session using the serverAccount (configured with API Key)
+    // This explicitly tells Appwrite to get account details for the given session.
+    const session = await serverAccount.getSession(sessionCookie.value);
+
+    // 3. Get the user account based on the userId from the session.
+    const account = await serverUsers.get(session.userId);
 
     if (!account || !account.$id) {
-      return false; // No authenticated user
+      return false;
     }
 
-    // Now, check if the user belongs to the admin team
-    const serverUsers = new ServerUsers(serverClient);
+    // 4. Use the global, privileged server client to check for admin team membership.
+    // This is required because checking team memberships requires admin-level permissions.
     const userMemberships = await serverUsers.listMemberships(account.$id);
-    const isAdmin = userMemberships.memberships.some(membership => membership.teamId === env.APPWRITE_ADMIN_TEAM_ID);
+    const isAdmin = userMemberships.memberships.some(membership => membership.teamId === serverEnv.APPWRITE_ADMIN_TEAM_ID);
     
     return isAdmin;
 
   } catch (error) {
-    // It's common for this to throw if the session is invalid.
+    // It's common for get() or getSession() to throw if the session is invalid or expired.
+    // Log for debugging, but return false for security.
+    console.debug('Admin authentication check failed:', error);
     return false;
   }
 }
@@ -57,9 +54,9 @@ export async function isAdminAuthenticated(request: NextRequest): Promise<boolea
 export function getAdminDocumentPermissions(): string[] {
   return [
     Permission.read(Role.any()), // Public read access
-    Permission.create(Role.team(env.APPWRITE_ADMIN_TEAM_ID)), // Only admin team can create
-    Permission.update(Role.team(env.APPWRITE_ADMIN_TEAM_ID)), // Only admin team can update
-    Permission.delete(Role.team(env.APPWRITE_ADMIN_TEAM_ID)), // Only admin team can delete
+    Permission.create(Role.team(serverEnv.APPWRITE_ADMIN_TEAM_ID)),
+    Permission.update(Role.team(serverEnv.APPWRITE_ADMIN_TEAM_ID)),
+    Permission.delete(Role.team(serverEnv.APPWRITE_ADMIN_TEAM_ID)),
   ];
 }
 
@@ -70,8 +67,8 @@ export function getAdminDocumentPermissions(): string[] {
 export function getCollectionAdminPermissions(): string[] {
   return [
     Permission.read(Role.any()), // Anyone can read documents
-    Permission.create(Role.team(env.APPWRITE_ADMIN_TEAM_ID)), // Only admin team can create documents
-    Permission.update(Role.team(env.APPWRITE_ADMIN_TEAM_ID)), // Only admin team can update documents
-    Permission.delete(Role.team(env.APPWRITE_ADMIN_TEAM_ID)), // Only admin team can delete documents
+    Permission.create(Role.team(serverEnv.APPWRITE_ADMIN_TEAM_ID)),
+    Permission.update(Role.team(serverEnv.APPWRITE_ADMIN_TEAM_ID)),
+    Permission.delete(Role.team(serverEnv.APPWRITE_ADMIN_TEAM_ID)),
   ];
 }
