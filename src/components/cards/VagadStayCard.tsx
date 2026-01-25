@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Hotel } from '@/lib/types'; // Corrected import
+import { Hotel } from '@/lib/schemas'; // Corrected import
 import { calculateIncentives, RipsIncentives } from '@/lib/rips';
 import { Star, MapPin } from 'lucide-react';
 import { getAppwriteFilePreviewUrl } from '@/lib/storage'; // New import

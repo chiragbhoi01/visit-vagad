@@ -3,7 +3,7 @@
 import React from 'react';
 import { DestinationForm } from '@/components/admin/DestinationForm';
 import { updateDestination } from '../../actions';
-import { Destination } from '@/lib/types';
+import { Destination } from '@/lib/schemas';
 import { toast } from 'sonner';
 
 interface EditDestinationFormProps {

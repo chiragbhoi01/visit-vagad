@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Destination } from '@/lib/types';
+import { Destination } from '@/lib/schemas';
 import Image from 'next/image';
 import { getAppwriteFilePreviewUrl } from '@/lib/storage';
 import { toast } from 'sonner';

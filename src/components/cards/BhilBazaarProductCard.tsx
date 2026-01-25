@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ArtisanProduct } from '@/lib/types'; // Corrected import
+import { ArtisanProduct } from '@/lib/schemas'; // Corrected import
 import { ShieldCheck, Sprout, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import { getAppwriteFilePreviewUrl } from '@/lib/storage'; // New import

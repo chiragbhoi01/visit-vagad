@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { destinationSchema } from '@/lib/schemas';
+import { DestinationFormSchema } from '@/lib/schemas';
 import { serverDatabases } from '@/lib/appwrite';
 import { serverEnv } from '@/lib/env';
 import { ID } from 'node-appwrite';
@@ -9,54 +9,70 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { getDestinationById } from '@/lib/queries';
 import { uploadMedia, deleteMedia } from '@/lib/storage.server';
+import { getAdminDocumentPermissions } from '@/lib/auth';
 
-// Helper to extract data from FormData and validate
+// Helper to extract data from FormData and validate using Zod
 function validateFormData(formData: FormData) {
   const rawFormData = {
-    name: formData.get('name') as string,
-    slug: formData.get('slug') as string,
-    description: formData.get('description') as string,
-    location: formData.get('location') as string,
+    name: formData.get('name'),
+    slug: formData.get('slug'),
+    district: formData.get('district'),
+    category: formData.get('category'),
+    shortDescription: formData.get('shortDescription'),
+    description: formData.get('description'),
+    bestTime: formData.get('bestTime'),
+    latitude: formData.get('latitude'),
+    longitude: formData.get('longitude'),
     isFeatured: formData.get('isFeatured') === 'true',
     isNationalMonumnet: formData.get('isNationalMonumnet') === 'true',
-    // coverImageId will be handled separately if a new image is uploaded
   };
 
-  return destinationSchema.parse(rawFormData);
+  return DestinationFormSchema.parse(rawFormData);
 }
 
-export async function createDestination(formData: FormData) {
+export async function createDestination(prevState: any, formData: FormData) {
   let newFileId: string | null = null;
   try {
     const validatedData = validateFormData(formData);
     const imageFile = formData.get('coverImage') as File;
     
+    let coverImageId: string | undefined = undefined;
     if (imageFile && imageFile.size > 0) {
       newFileId = await uploadMedia(imageFile, 'destinations');
-      validatedData.coverImageId = newFileId;
+      coverImageId = newFileId;
     }
+
+    const dataToSave = {
+        ...validatedData,
+        galleryImageIds: [], // Initialize as empty array
+        ...(coverImageId && { coverImageId }),
+    };
 
     await serverDatabases.createDocument(
       serverEnv.APPWRITE_DATABASE_ID,
       serverEnv.APPWRITE_COLLECTION_DESTINATIONS_ID,
       ID.unique(),
-      validatedData
+      dataToSave,
+      getAdminDocumentPermissions() // Apply permissions
     );
 
   } catch (error) {
     console.error('Error creating destination:', error);
-    // If upload succeeded but db failed, try to clean up the orphaned file
     if (newFileId) {
       await deleteMedia(newFileId);
     }
-    throw new Error('Failed to create destination. Please check the form data.');
+    if (error instanceof z.ZodError) {
+        return { message: 'Validation failed', errors: error.flatten().fieldErrors };
+    }
+    return { message: 'Failed to create destination.', errors: null };
   }
 
   revalidatePath('/admin/destinations');
+  revalidatePath('/');
   redirect('/admin/destinations');
 }
 
-export async function updateDestination(id: string, formData: FormData) {
+export async function updateDestination(id: string, prevState: any, formData: FormData) {
   let newFileId: string | null = null;
   try {
     const validatedData = validateFormData(formData);
@@ -67,38 +83,42 @@ export async function updateDestination(id: string, formData: FormData) {
       throw new Error('Destination not found.');
     }
     
-    // Handle image update
+    let coverImageId = existingDestination.coverImageId;
     if (imageFile && imageFile.size > 0) {
-      // Upload new image first
       newFileId = await uploadMedia(imageFile, 'destinations');
-      validatedData.coverImageId = newFileId;
-      
-      // If upload is successful and there was an old image, delete it
+      coverImageId = newFileId;
       if (existingDestination.coverImageId) {
         await deleteMedia(existingDestination.coverImageId);
       }
-    } else {
-      // If no new image, keep the old one
-      validatedData.coverImageId = existingDestination.coverImageId;
     }
+
+    const dataToSave = {
+        ...validatedData,
+        coverImageId,
+    };
 
     await serverDatabases.updateDocument(
       serverEnv.APPWRITE_DATABASE_ID,
       serverEnv.APPWRITE_COLLECTION_DESTINATIONS_ID,
       id,
-      validatedData
+      dataToSave,
+      getAdminDocumentPermissions() // Re-apply permissions on update
     );
 
   } catch (error) {
     console.error('Error updating destination:', error);
-    // If a new file was uploaded but the db update failed, try to clean it up
     if (newFileId) {
       await deleteMedia(newFileId);
     }
-    throw new Error('Failed to update destination.');
+    if (error instanceof z.ZodError) {
+        return { message: 'Validation failed', errors: error.flatten().fieldErrors };
+    }
+    return { message: 'Failed to update destination.', errors: null };
   }
 
   revalidatePath('/admin/destinations');
+  revalidatePath(`/admin/destinations/${id}/edit`);
+  revalidatePath('/');
   redirect('/admin/destinations');
 }
 
@@ -106,14 +126,12 @@ export async function deleteDestination(id: string) {
   try {
     const destination = await getDestinationById(id);
     
-    // Delete the document first
     await serverDatabases.deleteDocument(
       serverEnv.APPWRITE_DATABASE_ID,
       serverEnv.APPWRITE_COLLECTION_DESTINATIONS_ID,
       id
     );
 
-    // If document deletion is successful, delete the associated image
     if (destination && destination.coverImageId) {
       await deleteMedia(destination.coverImageId);
     }
@@ -124,4 +142,5 @@ export async function deleteDestination(id: string) {
   }
 
   revalidatePath('/admin/destinations');
+  revalidatePath('/');
 }
