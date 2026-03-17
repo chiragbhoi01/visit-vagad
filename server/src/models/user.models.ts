@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 import { IUser } from "../types";
-
+import bcrypt from "bcryptjs";
 
 const userSchema = new Schema<IUser>({
     name: {
@@ -28,6 +28,10 @@ const userSchema = new Schema<IUser>({
 }, {
     timestamps: true
 });
+
+userSchema.methods.isPasswordCorrect = async function (password: string) {
+    return await bcrypt.compare(password, this.password)
+}
 
 
 export const User: Model<IUser> = mongoose.model<IUser>("User", userSchema);

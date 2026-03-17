@@ -1,11 +1,18 @@
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
+import { Request } from "express";
+
+
+/* ---------------- IUser Schema Types ---------------- */
 
 export interface IUser extends Document {
     name: string;
     email: string;
     password: string;
     role: "user" | "admin";
+    isPasswordCorrect (password: string): Promise<boolean>
+
 }
+/* ---------------- IPlace Schema Types ---------------- */
 
 export interface IPlace extends Document {
     name: string;
@@ -17,4 +24,29 @@ export interface IPlace extends Document {
         latitude: number;
         longitude: number;
     };
+}
+/* ---------------- Day Schema Types ---------------- */
+export interface IDay {
+    dayNumber: number
+    places: Types.ObjectId[]
+    notes?: string
+}
+/* ---------------- Itinerary Schema Types ---------------- */
+
+export interface IItinerary extends Document {
+    user: Types.ObjectId
+    title: string
+    duration: number
+    days: IDay[]
+    isPublic: boolean
+    createdAt: Date
+    updatedAt: Date
+}
+
+/* ---------------- AuthRequest Types ---------------- */
+
+export interface AuthRequest extends Request {
+  user?: {
+    id: string
+  }
 }
