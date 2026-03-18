@@ -1,7 +1,6 @@
 import { useState, useContext } from "react"
 import { AuthContext } from "../context/AuthContext"
 import { useNavigate, Link } from "react-router-dom"
-import Loader from "../components/common/Loader"
 
 interface LoginFormData {
     email: string
@@ -63,7 +62,6 @@ function LoginPage() {
 
         try {
             setLoading(true)
-            if (loading) return <Loader />
             setError("")
 
             await authContext.login(formData.email, formData.password)
