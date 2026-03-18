@@ -1,5 +1,5 @@
 import mongoose, { Schema, model, Document, Model } from "mongoose";
-import { IPlace } from "../types";
+import { IPlace } from "../types/index.ts";
 
 
 const placeSchema = new Schema<IPlace>({
@@ -45,4 +45,6 @@ const placeSchema = new Schema<IPlace>({
 // Compound unique index: same place name can exist in different districts
 placeSchema.index({ name: 1, district: 1 }, { unique: true });
 
-export const Place: Model<IPlace> = mongoose.model<IPlace>("Place", placeSchema);
+const Place: Model<IPlace> = mongoose.model<IPlace>("Place", placeSchema);
+
+export default Place

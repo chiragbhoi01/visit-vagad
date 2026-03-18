@@ -1,5 +1,5 @@
 import { Document, Types } from "mongoose";
-import { Request } from "express";
+import type { Request as ExpressRequest } from "express";
 
 
 /* ---------------- IUser Schema Types ---------------- */
@@ -45,7 +45,7 @@ export interface IItinerary extends Document {
 
 /* ---------------- AuthRequest Types ---------------- */
 
-export interface AuthRequest extends Request {
+export interface AuthRequest extends ExpressRequest {
   user?: {
     id: string
   }
