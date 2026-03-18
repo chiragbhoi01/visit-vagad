@@ -48,5 +48,6 @@ export interface IItinerary extends Document {
 export interface AuthRequest extends ExpressRequest {
   user?: {
     id: string
+    role: "user" | "admin"
   }
 }

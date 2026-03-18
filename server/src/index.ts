@@ -2,19 +2,17 @@ import express from 'express';
 import { config } from './config/config.ts';
 import connectDB from './db/connectDatabase.ts';
 import authRouter from "./routes/auth.routes"
+import placeRouter from "./routes/place.routes.ts"
 
 
 const app = express();
 const PORT = config.port || 3000;
 
 // Essential middleware
-app.use(express.json());       
-app.use(express.urlencoded({ extended: true })); 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", authRouter)
-app.get('/home', (req, res) => {
-  console.log("Welcome to Visit Vagad"); 
-  res.send("Welcome to Visit Vagad");  
-});
+app.use("/api/places", placeRouter)
 
 // Await DB connection before listen
 const startServer = async () => {

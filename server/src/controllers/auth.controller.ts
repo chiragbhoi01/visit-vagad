@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 import jwt from "jsonwebtoken"
 import { AuthRequest } from "../types"
-import { User } from "../models"
+import { User } from "../models/user.models"
 import { asyncHandler, ApiError } from "../utils"
 import bcrypt from "bcryptjs"
 
@@ -10,11 +10,11 @@ import bcrypt from "bcryptjs"
 
 /* ---------- REGISTER ---------- */
 
-const register = asyncHandler(async (req: Request, res: Response) => {
+export const register = asyncHandler(async (req: Request, res: Response) => {
 
   const name = req.body.name
   const email = req.body.email
-  const password = req.body.password 
+  const password = req.body.password
 
   if (!name || !email || !password) {
     throw new ApiError(400, "Name, Email and Password required")
@@ -58,10 +58,10 @@ const register = asyncHandler(async (req: Request, res: Response) => {
 
 /* ---------- LOGIN ---------- */
 
-const login = asyncHandler(async (req: Request, res: Response) => {
+export const login = asyncHandler(async (req: Request, res: Response) => {
 
-   const email = req.body.email
-  const password = req.body.password 
+  const email = req.body.email
+  const password = req.body.password
 
   if (!email || !password) {
     throw new ApiError(400, "Email and password required")
@@ -106,7 +106,7 @@ const login = asyncHandler(async (req: Request, res: Response) => {
 
 /* ---------- GET CURRENT USER ---------- */
 
-const getMe = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getMe = asyncHandler(async (req: AuthRequest, res: Response) => {
 
   if (!req.user?.id) {
     throw new ApiError(401, "Unauthorized")
@@ -127,8 +127,3 @@ const getMe = asyncHandler(async (req: AuthRequest, res: Response) => {
 
 })
 
-export {
-  login,
-  register,
-  getMe
-}
