@@ -4,7 +4,8 @@ import LoginPage from "./pages/LoginPage"
 import RegisterPage from "./pages/RegisterPage"
 import ExplorePage from "./pages/ExplorePage"
 import Navbar from "./components/Navbar"
-
+import DashboardPage from "./pages/DashboardPage"
+import ProtectedRoute from "./components/ProtectedRoute"
 const App = () => {
   return (
     <BrowserRouter>
@@ -14,6 +15,11 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/explore" element={<ExplorePage />} />
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        } />
       </Routes>
     </BrowserRouter>
   )

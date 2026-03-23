@@ -1,11 +1,11 @@
-import { createContext, useState, useEffect } from "react"
+import { createContext, useState, useEffect, useContext } from "react"
 import { loginApi, registerApi, getMeApi } from "../apis/auth.api"
 import type IUser from "../types/index"
 
 interface AuthContextType {
   user: IUser | null
   token: string | null
-  login?: (email: string, password: string) => Promise<any>
+  login: (email: string, password: string) => Promise<any>
   register: (name: string, email: string, password: string) => Promise<any>
   logout: () => void
   loading: boolean
@@ -13,8 +13,15 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | null>(null)
 
-const AuthProvider = ({ children }: { children: any }) => {
+export const useAuth = () => {
+  const context = useContext(AuthContext)
+  if (!context) {
+    throw new Error("useAuth must be used within AuthProvider")
+  }
+  return context
+}
 
+const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<IUser | null>(null)
   const [token, setToken] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -22,37 +29,27 @@ const AuthProvider = ({ children }: { children: any }) => {
   /* ---------- LOGIN ---------- */
 
   const login = async (email: string, password: string) => {
-    try {
-      const res = await loginApi(email, password)
-      const { user, token } = res.data
+    const res = await loginApi(email, password)
+    const { user, token } = res.data
 
-      setUser(user)
-      setToken(token)
-      localStorage.setItem("token", token)
+    setUser(user)
+    setToken(token)
+    localStorage.setItem("token", token)
 
-      return res.data
-    } catch (error) {
-      console.error("Login failed:", error)
-      throw error
-    }
+    return res.data
   }
 
   /* ---------- REGISTER ---------- */
 
   const register = async (name: string, email: string, password: string) => {
-    try {
-      const res = await registerApi(name, email, password)
-      const { user, token } = res.data
+    const res = await registerApi(name, email, password)
+    const { user, token } = res.data
 
-      setUser(user)
-      setToken(token)
-      localStorage.setItem("token", token)
+    setUser(user)
+    setToken(token)
+    localStorage.setItem("token", token)
 
-      return res.data
-    } catch (error) {
-      console.error("Register failed:", error)
-      throw error
-    }
+    return res.data
   }
 
   /* ---------- LOGOUT ---------- */
@@ -63,25 +60,30 @@ const AuthProvider = ({ children }: { children: any }) => {
     localStorage.removeItem("token")
   }
 
-  /* ---------- AUTO LOGIN ---------- */
+  /* ---------- AUTO LOGIN (FIXED) ---------- */
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token")
+    const initAuth = async () => {
+      const storedToken = localStorage.getItem("token")
 
-    if (storedToken) {
-      setToken(storedToken)
+      if (!storedToken) {
+        setLoading(false)
+        return
+      }
 
-      // Fetch user profile with stored token
-      getMeApi()
-        .then(res => {
-          setUser(res.data.user)
-        })
-        .catch(() => {
-          logout()
-        })
+      try {
+        setToken(storedToken)
+
+        const res = await getMeApi()
+        setUser(res.data.user)
+      } catch (error) {
+        logout()
+      } finally {
+        setLoading(false)
+      }
     }
 
-    setLoading(false)
+    initAuth()
   }, [])
 
   return (
