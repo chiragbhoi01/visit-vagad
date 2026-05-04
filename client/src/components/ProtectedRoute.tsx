@@ -1,18 +1,22 @@
 import { Navigate, useLocation } from "react-router-dom"
-import { useAuth } from "../context/AuthContext"
+import { useAuth } from "@clerk/clerk-react"
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth()
+  const { isSignedIn, isLoaded } = useAuth()
   const location = useLocation()
 
-  if (loading) {
-    return <div>Checking authentication...</div>
+  if (!isLoaded) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+      </div>
+    )
   }
 
-  if (!user) {
+  if (!isSignedIn) {
     return (
       <Navigate 
-        to="/login" 
+        to="/" 
         state={{ from: location }} 
         replace 
       />

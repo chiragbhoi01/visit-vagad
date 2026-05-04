@@ -1,10 +1,12 @@
 import express, { Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
+import { rateLimit } from 'express-rate-limit';
 import { config } from './config/config.ts';
 import connectDB from './db/connectDatabase.ts';
 import authRouter from "./routes/auth.routes"
 import placeRouter from "./routes/place.routes.ts"
+import imageRouter from "./routes/image.routes"
 import { ApiError } from './utils/index.ts'
 
 
@@ -18,6 +20,19 @@ app.use(cors({
   credentials: true
 }));
 
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+	standardHeaders: 'draft-7', // set `RateLimit` and `RateLimit-Policy` headers
+	legacyHeaders: false, // disable the `X-RateLimit-*` headers
+  message: {
+    success: false,
+    message: "Too many requests from this IP, please try again after 15 minutes"
+  }
+});
+
+app.use("/api", limiter);
+
 /* ---------- PARSING MIDDLEWARE ---------- */
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -25,6 +40,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 /* ---------- ROUTES ---------- */
 app.use("/api/auth", authRouter)
 app.use("/api/places", placeRouter)
+app.use("/api/images", imageRouter)
 
 /* ---------- 404 HANDLER ---------- */
 app.use((req: Request, res: Response) => {
@@ -43,21 +59,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
       success: err.success,
       message: err.message,
       errors: err.errors
-    });
-  }
-
-  // Handle JWT errors
-  if (err.name === 'JsonWebTokenError') {
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid token'
-    });
-  }
-
-  if (err.name === 'TokenExpiredError') {
-    return res.status(401).json({
-      success: false,
-      message: 'Token expired'
     });
   }
 

@@ -7,24 +7,13 @@ const api = axios.create({
     }
 })
 
-/* ---------- REQUEST INTERCEPTOR ---------- */
-
-api.interceptors.request.use(
-    (config) => {
-
-        const token = localStorage.getItem("token")
-
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`
-        }
-
-        return config
-    },
-    (error) => {
-        return Promise.reject(error)
+export const setAuthToken = (token: string | null) => {
+    if (token) {
+        api.defaults.headers.common["Authorization"] = `Bearer ${token}`
+    } else {
+        delete api.defaults.headers.common["Authorization"]
     }
-)
-
+}
 
 /* ---------- RESPONSE INTERCEPTOR ---------- */
 
@@ -33,16 +22,9 @@ api.interceptors.response.use(
         return response
     },
     (error) => {
-
         if (error.response && error.response.status === 401) {
-
-            // remove invalid token
-            localStorage.removeItem("token")
-
-            // redirect to login
-            window.location.href = "/login"
+            // Unauthorized - could trigger a sign out or refresh here
         }
-
         return Promise.reject(error)
     }
 )

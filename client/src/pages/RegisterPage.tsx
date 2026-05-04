@@ -1,7 +1,7 @@
 import { useState, useContext } from "react"
 import { AuthContext } from "../context/AuthContext"
 import { useNavigate, Link } from "react-router-dom"
-import type IUser from "../types"
+import type { IUser } from "../types"
 
 function RegisterPage() {
   const authContext = useContext(AuthContext)

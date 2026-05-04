@@ -1,73 +1,32 @@
-# React + TypeScript + Vite
+# VisitVagad Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A high-performance React application built with Vite and Tailwind CSS v4, following the "Editorial Heritage" design system.
 
-Currently, two official plugins are available:
+## 🎨 Design Philosophy: "The Modern Chronicler"
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The UI is designed to feel like a sophisticated travel magazine:
+- **Tonal Depth:** Layered surfaces (`surface`, `surface-container`) instead of shadows.
+- **Translucent Horizon:** A glassmorphism navigation bar.
+- **Editorial Typography:** Pairing Epilogue for headlines with Plus Jakarta Sans for body text.
 
-## React Compiler
+## 🔐 Auth Integration
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Powered by `@clerk/clerk-react`.
+- Uses `ClerkProvider` in `main.tsx`.
+- Custom `RoleRoute` component for protecting sensitive areas.
+- Automatic token synchronization with backend via Axios interceptors.
 
-## Expanding the ESLint configuration
+## 📸 Image Management
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Utilizes `@imagekit/react` for direct-to-cloud uploads.
+- Optimized delivery with `q-auto, f-auto`.
+- Real-time transformations for different viewports.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## ⚙️ Environment Variables
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```env
+VITE_API_URL=http://localhost:5000
+VITE_CLERK_PUBLISHABLE_KEY=your_clerk_key
+VITE_IMAGEKIT_PUBLIC_KEY=your_imagekit_public
+VITE_IMAGEKIT_URL_ENDPOINT=your_imagekit_endpoint
 ```

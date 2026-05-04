@@ -15,23 +15,24 @@ const userSchema = new Schema<IUser>({
         lowercase: true,
         match: [/^\S+@\S+\.\S+$/, "Please use a valid email"]
     },
+    clerkId: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
     password: {
         type: String,
-        required: true,
+        required: false,
         minlength: 6
     },
     role: {
         type: String,
-        enum: ["user", "admin"],
+        enum: ["user", "editor", "admin"],
         default: "user"
     }
 }, {
     timestamps: true
 });
-
-userSchema.methods.isPasswordCorrect = async function (password: string) {
-    return await bcrypt.compare(password, this.password)
-}
 
 
 export const User: Model<IUser> = mongoose.model<IUser>("User", userSchema);

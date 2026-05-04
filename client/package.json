@@ -10,11 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.61.6",
+    "@imagekit/react": "^5.0.2",
     "@tailwindcss/vite": "^4.2.2",
     "axios": "^1.13.6",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.13.1",
+    "sonner": "^2.0.7",
     "tailwindcss": "^4.2.2"
   },
   "devDependencies": {

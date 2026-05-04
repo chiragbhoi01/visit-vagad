@@ -8,6 +8,11 @@ const placeSchema = new Schema<IPlace>({
         required: true,
         trim: true
     },
+    description: {
+        type: String,
+        required: true,
+        trim: true
+    },
     district: {
         type: String,
         enum: ["Banswara", "Dungarpur"],
@@ -18,10 +23,19 @@ const placeSchema = new Schema<IPlace>({
         enum: ["temple", "nature", "tribal", "waterfall", "historical", "spiritual"],
         required: true
     },
-    images: [{
+    image: {
         type: String,
+        required: true,
         trim: true
-    }],
+    },
+    featured: {
+        type: Boolean,
+        default: false
+    },
+    trending: {
+        type: Boolean,
+        default: false
+    },
     bestSeason: {
         type: String,
         enum: ["Summer", "Monsoon", "Winter"]
