@@ -7,18 +7,20 @@ import type { Request as ExpressRequest } from "express";
 export interface IUser extends Document {
     name: string;
     email: string;
-    password: string;
-    role: "user" | "admin";
-    isPasswordCorrect (password: string): Promise<boolean>
-
+    clerkId?: string;
+    password?: string;
+    role: "user" | "editor" | "admin";
 }
 /* ---------------- IPlace Schema Types ---------------- */
 
 export interface IPlace extends Document {
     name: string;
+    description: string;
     district: "Banswara" | "Dungarpur";
     category: "temple" | "nature" | "tribal" | "waterfall" | "historical" | "spiritual";
-    images: string[];
+    image: string;
+    featured: boolean;
+    trending: boolean;
     bestSeason?: "Summer" | "Monsoon" | "Winter";
     coordinates: {
         latitude: number;
@@ -48,6 +50,6 @@ export interface IItinerary extends Document {
 export interface AuthRequest extends ExpressRequest {
   user?: {
     id: string
-    role: "user" | "admin"
+    role: "user" | "editor" | "admin"
   }
 }

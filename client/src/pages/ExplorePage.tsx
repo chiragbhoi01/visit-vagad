@@ -1,136 +1,150 @@
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
 import { getAllPlacesApi } from "../apis/places.api"
+import type { IPlace } from "../types"
+import Loader from "../components/common/Loader"
+import { toast } from "sonner"
 
-function ExplorePage() {
-  const [places, setPlaces] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
+const ExplorePage = () => {
+  const [places, setPlaces] = useState<IPlace[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [filter, setFilter] = useState({ district: "", category: "" })
+  const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 })
 
-  const [search, setSearch] = useState("")
-  const [selectedDistrict, setSelectedDistrict] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState("")
+  const fetchPlaces = async (page = 1) => {
+    setIsLoading(true)
+    try {
+      const res = await getAllPlacesApi(filter.district, filter.category, undefined, undefined)
+      const data = res?.data?.data
+      setPlaces(data?.places || [])
+      setPagination({
+        page: data?.page || 1,
+        pages: data?.pages || 1,
+        total: data?.total || 0
+      })
+    } catch (error) {
+      console.error("Error fetching places:", error)
+      toast.error("Failed to load heritage sites")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const fetchPlaces = async () => {
-      try {
-        const res = await getAllPlacesApi()
-        setPlaces(res.data.data || [])
-      } catch (err: any) {
-        setError("Failed to fetch places")
-      } finally {
-        setLoading(false)
-      }
-    }
+    fetchPlaces(1)
+  }, [filter])
 
-    fetchPlaces()
-  }, [])
-
-  // 🔥 Filtering logic
-  const filteredPlaces = places.filter((place: any) => {
-    const matchesSearch = place.name
-      ?.toLowerCase()
-      .includes(search.toLowerCase())
-
-    const matchesDistrict = selectedDistrict
-      ? place.district === selectedDistrict
-      : true
-
-    const matchesCategory = selectedCategory
-      ? place.category === selectedCategory
-      : true
-
-    return matchesSearch && matchesDistrict && matchesCategory
-  })
+  const categories = ["temple", "nature", "tribal", "waterfall", "historical", "spiritual"]
+  const districts = ["Banswara", "Dungarpur"]
 
   return (
-    <div className="min-h-screen bg-gray-900 px-6 py-10">
-      
-      <h1 className="text-3xl font-bold text-white mb-6">
-        Explore Places
-      </h1>
-
-      {/* 🔍 Filters */}
-      <div className="mb-8">
-        <div className="flex flex-col md:flex-row gap-4">
+    <div className="min-h-screen bg-surface pt-24 pb-12 px-6">
+      <div className="max-w-7xl mx-auto">
+        <header className="mb-12">
+          <span className="text-primary text-sm font-bold tracking-[0.2em] uppercase mb-2 block">
+            Discover the Hidden
+          </span>
+          <h1 className="text-5xl font-epilogue font-bold text-on-surface mb-6">
+            Curated Experiences
+          </h1>
           
-          <input
-            type="text"
-            placeholder="Search places..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="px-4 py-2 rounded-lg w-full bg-gray-800 text-white outline-none"
-          />
+          {/* Filters */}
+          <div className="flex flex-wrap gap-4 mt-8">
+            <select 
+              className="bg-surface-container-low border-none rounded-full px-6 py-2 text-sm font-bold focus:ring-2 focus:ring-primary outline-none"
+              value={filter.district}
+              onChange={(e) => setFilter({ ...filter, district: e.target.value })}
+            >
+              <option value="">All Districts</option>
+              {districts.map(d => <option key={d} value={d}>{d}</option>)}
+            </select>
 
-          <select
-            value={selectedDistrict}
-            onChange={(e) => setSelectedDistrict(e.target.value)}
-            className="px-4 py-2 rounded-lg bg-gray-800 text-white"
-          >
-            <option value="">All Districts</option>
-            <option value="Banswara">Banswara</option>
-            <option value="Dungarpur">Dungarpur</option>
-          </select>
-
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-4 py-2 rounded-lg bg-gray-800 text-white"
-          >
-            <option value="">All Categories</option>
-            <option value="temple">Temple</option>
-            <option value="nature">Nature</option>
-            <option value="historical">Historical</option>
-            <option value="spiritual">Spiritual</option>
-            <option value="tribal">Tribal</option>
-          </select>
-
-        </div>
-      </div>
-
-      {/* ⏳ Loading */}
-      {loading && (
-        <p className="text-gray-400">Loading places...</p>
-      )}
-
-      {/* ❌ Error */}
-      {error && (
-        <p className="text-red-500">{error}</p>
-      )}
-
-      {/* 📦 Grid */}
-      {!loading && !error && (
-        <>
-          {filteredPlaces.length === 0 ? (
-            <p className="text-gray-400">No places found.</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {filteredPlaces.map((place: any) => (
-                <div
-                  key={place._id}
-                  className="bg-gray-800 rounded-xl overflow-hidden hover:scale-105 transition duration-300 cursor-pointer"
+            <div className="flex flex-wrap gap-2">
+              <button 
+                onClick={() => setFilter({ ...filter, category: "" })}
+                className={`px-6 py-2 rounded-full text-xs font-bold tracking-widest uppercase transition-all ${!filter.category ? 'bg-secondary text-white' : 'bg-surface-container-high text-on-surface/60 hover:bg-surface-container-highest'}`}
+              >
+                All
+              </button>
+              {categories.map(c => (
+                <button 
+                  key={c}
+                  onClick={() => setFilter({ ...filter, category: c })}
+                  className={`px-6 py-2 rounded-full text-xs font-bold tracking-widest uppercase transition-all ${filter.category === c ? 'bg-secondary text-white' : 'bg-surface-container-high text-on-surface/60 hover:bg-surface-container-highest'}`}
                 >
-                  <img
-                    src={place.images?.[0] || "https://placehold.co/400x200"}
-                    alt={place.name}
-                    className="h-48 w-full object-cover"
-                  />
+                  {c}
+                </button>
+              ))}
+            </div>
+          </div>
+        </header>
 
-                  <div className="p-4">
-                    <h2 className="text-white text-xl font-semibold">
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+              {places.map((place) => (
+                <div key={place._id} className="group cursor-pointer">
+                  <div className="aspect-[4/5] rounded-2xl overflow-hidden mb-6 bg-surface-container shadow-sm group-hover:shadow-xl transition-all duration-500">
+                    <img 
+                      src={`${place.image}?tr=w-600,h-800,q-auto,f-auto`} 
+                      alt={place.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-start">
+                      <span className="text-primary text-[10px] font-bold tracking-[0.2em] uppercase">
+                        {place.category} • {place.district}
+                      </span>
+                      {place.featured && (
+                        <span className="bg-primary/10 text-primary text-[10px] px-2 py-1 rounded-full font-bold uppercase">
+                          Featured
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-2xl font-epilogue font-bold text-on-surface group-hover:text-primary transition-colors">
                       {place.name}
-                    </h2>
-
-                    <p className="text-gray-400 text-sm">
-                      {place.district} • {place.category}
+                    </h3>
+                    <p className="text-on-surface/60 text-sm line-clamp-2 leading-relaxed">
+                      {place.description}
                     </p>
                   </div>
                 </div>
               ))}
             </div>
-          )}
-        </>
-      )}
 
+            {/* Pagination Controls */}
+            {pagination.pages > 1 && (
+              <div className="mt-16 flex justify-center items-center gap-4">
+                <button
+                  disabled={pagination.page === 1}
+                  onClick={() => fetchPlaces(pagination.page - 1)}
+                  className="px-6 py-2 rounded-full border border-outline-variant/30 text-xs font-bold uppercase tracking-widest hover:border-primary hover:text-primary disabled:opacity-20 transition-all"
+                >
+                  Previous
+                </button>
+                <span className="text-xs font-bold text-on-surface/40">
+                  Page {pagination.page} of {pagination.pages}
+                </span>
+                <button
+                  disabled={pagination.page === pagination.pages}
+                  onClick={() => fetchPlaces(pagination.page + 1)}
+                  className="px-6 py-2 rounded-full border border-outline-variant/30 text-xs font-bold uppercase tracking-widest hover:border-primary hover:text-primary disabled:opacity-20 transition-all"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
+        )}
+
+        {!isLoading && places.length === 0 && (
+          <div className="text-center py-24">
+            <p className="text-on-surface/40 text-lg">No places found matching your criteria.</p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

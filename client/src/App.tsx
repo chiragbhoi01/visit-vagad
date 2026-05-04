@@ -1,26 +1,56 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { useEffect, lazy, Suspense } from "react"
+import { useAuth } from "@clerk/clerk-react"
 import HomePage from "./pages/HomePage"
-import LoginPage from "./pages/LoginPage"
-import RegisterPage from "./pages/RegisterPage"
-import ExplorePage from "./pages/ExplorePage"
 import Navbar from "./components/Navbar"
-import DashboardPage from "./pages/DashboardPage"
 import ProtectedRoute from "./components/ProtectedRoute"
+import RoleRoute from "./components/RoleRoute"
+import Loader from "./components/common/Loader"
+import { setAuthToken } from "./apis/axiosInstance"
+
+const ExplorePage = lazy(() => import("./pages/ExplorePage"))
+const DashboardPage = lazy(() => import("./pages/DashboardPage"))
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"))
+
+const TokenSync = () => {
+  const { getToken, isSignedIn } = useAuth()
+
+  useEffect(() => {
+    const syncToken = async () => {
+      if (isSignedIn) {
+        const token = await getToken()
+        setAuthToken(token)
+      } else {
+        setAuthToken(null)
+      }
+    }
+    syncToken()
+  }, [isSignedIn, getToken])
+
+  return null
+}
+
 const App = () => {
   return (
     <BrowserRouter>
+      <TokenSync />
       <Navbar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/explore" element={<ExplorePage />} />
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        } />
-      </Routes>
+      <Suspense fallback={<Loader />}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/explore" element={<ExplorePage />} />
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin" element={
+            <RoleRoute allowedRoles={["admin", "editor"]}>
+              <AdminDashboard />
+            </RoleRoute>
+          } />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }
